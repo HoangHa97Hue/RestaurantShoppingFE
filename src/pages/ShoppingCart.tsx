@@ -60,6 +60,8 @@ function ShoppingCart() {
       });
     }
   };
+  //a component that uses data from a slice of Redux will rerender when the data in the state of the slice changes. 
+  //This ensures that the component reflects the newest data and remains in sync with the application state
   // console.log(cartItems)
   return (
     <Grid container>

@@ -5,6 +5,7 @@ import { menuItemApi } from '../../apis';
 import { shoppingCartApi } from '../../apis/shoppingCartAPI';
 import { userAuthenAPI } from '../../apis/userAuthenAPI';
 import { userAuthenReducer } from './userAuthenSlice';
+import { menuItemsSearchReducer } from './menuItemsSearchSlice';
  const store = configureStore({
 reducer: {
     menuItemStore: menuItemReducer,
@@ -13,6 +14,7 @@ reducer: {
     [shoppingCartApi.reducerPath] : shoppingCartApi .reducer,
     [userAuthenAPI.reducerPath] : userAuthenAPI.reducer,
     userAuthenStore: userAuthenReducer,
+    menuItemsSearchStore: menuItemsSearchReducer
 
 },
 middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(menuItemApi.middleware).concat(shoppingCartApi.middleware).concat(userAuthenAPI.middleware)

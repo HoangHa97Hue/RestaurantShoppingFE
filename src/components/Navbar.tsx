@@ -1,5 +1,5 @@
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrunchDining, Mail, Notifications, Restaurant, RestaurantMenu, ShoppingCart } from "@mui/icons-material";
 import {
   AppBar,
@@ -14,10 +14,12 @@ import {
   createTheme
 } from "@mui/material";
 import React from "react";
-import { cartItemModel, userModel } from "../interfaces";
-import { useSelector } from "react-redux";
+import { cartItemModel, menuItemModel, userModel } from "../interfaces";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../storage/redux/store";
 import { useNavigate } from "react-router-dom";
+import { useDebounce } from "./uitility/UseDebounce";
+import { setMenuItemsSearch } from "../storage/redux/menuItemsSearchSlice";
 
 
 
@@ -57,10 +59,29 @@ function Navbar() {
   const navigate =useNavigate();
   const userData :userModel = useSelector((state: RootState) => state.userAuthenStore)
   const cartItems :cartItemModel[] = useSelector((state: RootState) => state.shoppingCartStore.cartItems ?? [])
+  const distPatch = useDispatch();
  
   const handleClickCart = () => {
     navigate("/shoppingCart");
   }
+
+  const [search, setSearchData] = useState('');
+  const debounceSearch = useDebounce(search);  
+
+  const menuItems: menuItemModel[] = useSelector(
+    (state: RootState) => state.menuItemStore.menuItem ?? []
+  );
+
+  useEffect(() => {
+    //get data tu slice len roi filter
+    // menuItems.filter(item => item.name === debounceSearch);
+    // distPatch(setMenuItemsSearch(menuItems));
+
+    const filteredMenuItems = menuItems.filter(item => item.name.toLowerCase().includes(debounceSearch));
+    
+    // Dispatch filtered menu items
+    distPatch(setMenuItemsSearch(filteredMenuItems));
+  }, [debounceSearch])
 
   console.log("In Navbar component, CartItems length: "+cartItems.length);
   return (
@@ -72,7 +93,7 @@ function Navbar() {
         <BrunchDining sx={{ display: { xs: "block", sm: "none" } }} />
         <StyledSearch>
           {" "}
-          <InputBase placeholder="search..." />
+          <InputBase placeholder="search..." onChange={(e) => setSearchData(e.target.value)}/>
         </StyledSearch>
         <StylePersonalInfo>
         <i style={{cursor:"pointer"}} onClick={handleClickCart}><Badge badgeContent={cartItems.length} color="error">

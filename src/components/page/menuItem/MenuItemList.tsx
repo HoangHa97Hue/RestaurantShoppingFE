@@ -3,9 +3,11 @@ import { menuItemModel } from "../../../interfaces";
 import { Box, Grid, styled } from "@mui/material";
 import MenuItemCard from "./MenuItemCard";
 import { useGetMenuItemsQuery } from "../../../apis/menuItemAPI";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setMenuItems } from "../../../storage/redux/menuItemSlice";
 import { MiniLoader } from "../../common";
+import { useDebounce } from "../../uitility/UseDebounce";
+import { RootState } from "../../../storage/redux/store";
 
 function MenuItemList() {
   const StyleBox = styled(Box)({
@@ -19,6 +21,9 @@ function MenuItemList() {
     justifyContent: "center",
   });
 
+  // const [search, setSearchData] = useState('');
+  // const debounceSearch = useDebounce(search);  // co the tach ra 1 component hien thi search
+
   // const [menuItems, setMenuItems] = useState<menuItemModel[]>([]);
   // useEffect(() => {
   //   fetch("https://localhost:7097/api/MenuItem")
@@ -28,6 +33,7 @@ function MenuItemList() {
   //       setMenuItems(data.result);
   //     });
   // }, []);
+
   const { data, isLoading } = useGetMenuItemsQuery(null);
   const distPatch = useDispatch();
   useEffect(() => {
@@ -35,6 +41,10 @@ function MenuItemList() {
       distPatch(setMenuItems(data.result));
     }
   }, [isLoading]);
+
+  const menuItems: menuItemModel[] = useSelector(
+    (state: RootState) => state.menuItemsSearchStore.menuItem ?? []
+  );
 
   return (
     <StyleBox flex={4} sx={{ bgcolor: "", padding: 0 }}>
@@ -48,10 +58,20 @@ function MenuItemList() {
           {/* {menuItems?.map((menuItem, index) => {
               return <MenuItemCard menuItem={menuItem} key={index} />;
             })} */}
-          {data.result.length > 0 &&
+
+          {/* {data.result.length > 0 &&
             data.result.map((menuItem: menuItemModel, index: any) => {
               return <MenuItemCard menuItem={menuItem} key={index} />;
-            })}
+            })} */}
+          {menuItems.length === 0
+            ? data.result.length > 0 &&
+              data.result.map((menuItem: menuItemModel, index: any) => {
+                return <MenuItemCard menuItem={menuItem} key={index} />;
+              })
+            : menuItems.length > 0 &&
+              menuItems.map((menuItem: menuItemModel, index: any) => {
+                return <MenuItemCard menuItem={menuItem} key={index} />;
+              })}
         </StyleGrid>
       )}
     </StyleBox>
